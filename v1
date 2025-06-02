@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic Tac Toe (Disappearing X/O)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #181c24;
+            color: #f5f8fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #f5f8fa;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #23293a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 48px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cell:hover {
+            background-color: #1b2233;
+        }
+
+        .mark {
+            position: absolute;
+            transition: opacity 0.5s, color 0.4s;
+            z-index: 2;
+            user-select: none;
+        }
+
+        .mark.x-mark {
+            color: #4fa3ff;
+            text-shadow: 0 0 5px #294e7a;
+        }
+
+        .mark.o-mark {
+            color: #ff4f4f;
+            text-shadow: 0 0 5px #7a2929;
+        }
+
+        .transparent {
+            opacity: 0.2;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .status {
+            margin: 20px 0;
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffe066;
+            text-shadow: 0 0 5px #764d00;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #384e70;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+
+        button:hover {
+            background-color: #28354c;
+        }
+
+        .win-line {
+            position: absolute;
+            background: #ffe066;
+            height: 8px;
+            border-radius: 4px;
+            z-index: 10;
+            pointer-events: none;
+            box-shadow: 0 0 12px 2px #ffe066cc;
+            /* The line is drawn from the center of the start cell to the center of the end cell */
+            transform-origin: 0 50%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tic Tac Toe (Disappearing X/O)</h1>
+    <div class="status" id="status">Player X's turn</div>
+    <div class="board" id="board"></div>
+    <button id="reset">Reset Game</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const board = document.getElementById('board');
+            const statusDisplay = document.getElementById('status');
+            const resetButton = document.getElementById('reset');
+
+            let gameState = ['', '', '', '', '', '', '', '', ''];
+            let currentPlayer = 'X';
+            let gameActive = true;
+            let allMoves = [];
+            let moveCount = 0;
+            let winLineElement = null;
+
+            // [cell0, cell1, cell2, ...]
+            const winningConditions = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
+                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
+                [0, 4, 8], [2, 4, 6]             // diagonals
+            ];
+
+            // For win line: Each triple corresponds to start and end cell indices
+            // (mapping: [fromCellIndex, toCellIndex])
+            const winLineMap = [
+                [0, 2], [3, 5], [6, 8], // rows
+                [0, 6], [1, 7], [2, 8], // columns
+                [0, 8], [2, 6]          // diagonals
+            ];
+
+            function initializeBoard() {
+                board.innerHTML = '';
+                for (let i = 0; i < 9; i++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.setAttribute('data-index', i);
+                    cell.addEventListener('click', handleCellClick);
+                    board.appendChild(cell);
+                }
+            }
+
+            function handleCellClick(e) {
+                const clickedCell = e.target;
+                const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
+                if (gameState[clickedCellIndex] !== '' || !gameActive) {
+                    return;
+                }
+                const mark = document.createElement('span');
+                mark.classList.add('mark');
+                if (currentPlayer === 'X') {
+                    mark.classList.add('x-mark');
+                } else {
+                    mark.classList.add('o-mark');
+                }
+                mark.textContent = currentPlayer;
+                clickedCell.appendChild(mark);
+                gameState[clickedCellIndex] = currentPlayer;
+                allMoves.push({
+                    index: clickedCellIndex,
+                    player: currentPlayer,
+                    element: mark,
+                    visible: true
+                });
+                moveCount++;
+                handleDisappearingMoves();
+                checkResult();
+            }
+
+            function handleDisappearingMoves() {
+                // Only keep the most recent 7 visible marks
+                const visibleMoves = allMoves.filter(move => move.visible);
+
+                // Reset all transparency and hidden on all visible moves
+                visibleMoves.forEach(move => {
+                    move.element.classList.remove('transparent', 'hidden');
+                });
+
+                if (moveCount <= 7) {
+                    // All marks stay visible, but if moveCount == 7, make the oldest one transparent
+                    if (moveCount === 7 && visibleMoves.length > 0) {
+                        visibleMoves[0].element.classList.add('transparent');
+                    }
+                    return;
+                }
+
+                // For moves 8 and onward, hide the oldest visible mark, and make the next-to-hide transparent
+                const toHide = visibleMoves.length - 7;
+                for (let i = 0; i < toHide; i++) {
+                    visibleMoves[i].element.classList.add('hidden');
+                    visibleMoves[i].visible = false;
+                    gameState[visibleMoves[i].index] = '';
+                }
+
+                // Make the next-to-hide mark transparent (if it exists)
+                const updatedVisibleMoves = allMoves.filter(move => move.visible);
+                if (updatedVisibleMoves.length > 0) {
+                    updatedVisibleMoves[0].element.classList.add('transparent');
+                }
+            }
+
+            function checkResult() {
+                let roundWon = false;
+                let winIndex = -1;
+                for (let i = 0; i < winningConditions.length; i++) {
+                    const [a, b, c] = winningConditions[i];
+                    if (gameState[a] === '' || gameState[b] === '' || gameState[c] === '') {
+                        continue;
+                    }
+                    if (gameState[a] === gameState[b] && gameState[b] === gameState[c]) {
+                        roundWon = true;
+                        winIndex = i;
+                        break;
+                    }
+                }
+                if (roundWon) {
+                    statusDisplay.textContent = `Player ${currentPlayer} wins!`;
+                    gameActive = false;
+                    drawWinLine(winIndex);
+                    return;
+                }
+                // If all 9 cells are filled (regardless of how many are visible), it's a draw
+                if (allMoves.filter(move => move.visible).length === 0 || !gameState.includes('')) {
+                    statusDisplay.textContent = "Game ended in a draw!";
+                    gameActive = false;
+                    return;
+                }
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+            }
+
+            function coordsForCell(cellIndex) {
+                // Use offsetLeft/Top relative to .board and add half cell size
+                const cell = board.children[cellIndex];
+                return {
+                    x: cell.offsetLeft + cell.offsetWidth / 2,
+                    y: cell.offsetTop + cell.offsetHeight / 2
+                };
+            }
+
+            function drawWinLine(winIndex) {
+                // Remove any previous line
+                if (winLineElement) {
+                    winLineElement.remove();
+                }
+                // Which cells does this win use?
+                const [startCellIdx, endCellIdx] = winLineMap[winIndex];
+
+                // Use setTimeout to ensure DOM is fully rendered before getting positions
+                setTimeout(() => {
+                    const start = coordsForCell(startCellIdx);
+                    const end = coordsForCell(endCellIdx);
+
+                    const dx = end.x - start.x;
+                    const dy = end.y - start.y;
+                    const length = Math.sqrt(dx * dx + dy * dy);
+                    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+                    winLineElement = document.createElement('div');
+                    winLineElement.className = 'win-line';
+                    winLineElement.style.width = `${length}px`;
+                    winLineElement.style.left = `${start.x}px`;
+                    winLineElement.style.top = `${start.y - 4}px`; // -4px to center line vertically
+                    winLineElement.style.transform = `rotate(${angle}deg)`;
+                    winLineElement.style.transformOrigin = '0 50%';
+                    board.appendChild(winLineElement);
+                }, 30);
+            }
+
+            function resetGame() {
+                gameState = ['', '', '', '', '', '', '', '', ''];
+                currentPlayer = 'X';
+                gameActive = true;
+                allMoves = [];
+                moveCount = 0;
+                statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+                document.querySelectorAll('.cell').forEach(cell => {
+                    cell.innerHTML = '';
+                });
+                if (winLineElement) {
+                    winLineElement.remove();
+                    winLineElement = null;
+                }
+            }
+
+            resetButton.addEventListener('click', resetGame);
+            initializeBoard();
+        });
+    </script>
+</body>
+</html>
