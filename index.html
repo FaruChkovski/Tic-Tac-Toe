@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe (Disappearing X/O)</title>
+    <title>Tic Tac Toe - Large</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,35 +12,54 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 50px;
+            margin-top: 70px;
         }
 
-        h1 {
-            color: #f5f8fa;
+        .game-title {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            margin-bottom: 30px;
+            margin-top: 0;
+        }
+
+        .game-title-text {
+            font-size: 3.2em;
+            font-weight: bold;
+            letter-spacing: 6px;
+            background: linear-gradient(90deg,#4fa3ff 0%, #ffe066 50%, #ff4f4f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+            text-align: center;
+            margin: 0;
         }
 
         .board {
             display: grid;
-            grid-template-columns: repeat(3, 100px);
-            grid-template-rows: repeat(3, 100px);
-            gap: 5px;
-            margin: 20px 0;
+            grid-template-columns: repeat(3, 220px);
+            grid-template-rows: repeat(3, 220px);
+            gap: 18px;
+            margin: 40px 0;
             position: relative;
         }
 
         .cell {
-            width: 100px;
-            height: 100px;
+            width: 220px;
+            height: 220px;
             background-color: #23293a;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 48px;
+            font-size: 120px;
             cursor: pointer;
-            border-radius: 5px;
+            border-radius: 16px;
             transition: all 0.3s ease;
             position: relative;
             z-index: 1;
+            box-shadow: 0 8px 32px #10131a44;
         }
 
         .cell:hover {
@@ -52,20 +71,22 @@
             transition: opacity 0.5s, color 0.4s;
             z-index: 2;
             user-select: none;
+            font-size: 150px;
+            line-height: 1;
         }
 
         .mark.x-mark {
             color: #4fa3ff;
-            text-shadow: 0 0 5px #294e7a;
+            text-shadow: 0 0 18px #294e7a;
         }
 
         .mark.o-mark {
             color: #ff4f4f;
-            text-shadow: 0 0 5px #7a2929;
+            text-shadow: 0 0 18px #7a2929;
         }
 
         .transparent {
-            opacity: 0.2;
+            opacity: 0.18;
         }
 
         .hidden {
@@ -73,46 +94,65 @@
         }
 
         .status {
-            margin: 20px 0;
-            font-size: 24px;
+            margin: 40px 0 25px 0;
+            font-size: 40px;
             font-weight: bold;
+            letter-spacing: 1px;
+            min-height: 48px;
+            text-shadow: 0 0 16px #222, 0 0 4px #444;
+            text-align: center;
+        }
+
+        .status.x {
+            color: #4fa3ff;
+            text-shadow: 0 0 16px #294e7a, 0 0 2px #222;
+        }
+        .status.o {
+            color: #ff4f4f;
+            text-shadow: 0 0 16px #7a2929, 0 0 2px #222;
+        }
+        .status.draw {
             color: #ffe066;
-            text-shadow: 0 0 5px #764d00;
+            text-shadow: 0 0 16px #764d00;
         }
 
         button {
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 18px 44px;
+            font-size: 28px;
             background-color: #384e70;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 9px;
             cursor: pointer;
-            margin-top: 6px;
+            margin-top: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 2px 8px #111a2a55;
+            display: none; /* Start hidden */
         }
 
-        button:hover {
-            background-color: #28354c;
+        button.show {
+            display: block !important;
         }
 
         .win-line {
             position: absolute;
             background: #ffe066;
-            height: 8px;
-            border-radius: 4px;
+            height: 22px;
+            border-radius: 11px;
             z-index: 10;
             pointer-events: none;
-            box-shadow: 0 0 12px 2px #ffe066cc;
-            /* The line is drawn from the center of the start cell to the center of the end cell */
+            box-shadow: 0 0 36px 8px #ffe066cc;
             transform-origin: 0 50%;
         }
     </style>
 </head>
 <body>
-    <h1>Tic Tac Toe (Disappearing X/O)</h1>
-    <div class="status" id="status">Player X's turn</div>
+    <div class="game-title">
+        <h1 class="game-title-text">TIC TAC TOE</h1>
+    </div>
+    <div class="status x" id="status">X's turn</div>
     <div class="board" id="board"></div>
-    <button id="reset">Reset Game</button>
+    <button id="reset">New Game</button>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -127,15 +167,12 @@
             let moveCount = 0;
             let winLineElement = null;
 
-            // [cell0, cell1, cell2, ...]
+            // Winning conditions and win line mapping
             const winningConditions = [
                 [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
                 [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
                 [0, 4, 8], [2, 4, 6]             // diagonals
             ];
-
-            // For win line: Each triple corresponds to start and end cell indices
-            // (mapping: [fromCellIndex, toCellIndex])
             const winLineMap = [
                 [0, 2], [3, 5], [6, 8], // rows
                 [0, 6], [1, 7], [2, 8], // columns
@@ -190,7 +227,6 @@
                 });
 
                 if (moveCount <= 7) {
-                    // All marks stay visible, but if moveCount == 7, make the oldest one transparent
                     if (moveCount === 7 && visibleMoves.length > 0) {
                         visibleMoves[0].element.classList.add('transparent');
                     }
@@ -227,19 +263,27 @@
                     }
                 }
                 if (roundWon) {
-                    statusDisplay.textContent = `Player ${currentPlayer} wins!`;
+                    statusDisplay.textContent = `${currentPlayer} wins!`;
+                    statusDisplay.classList.remove('x', 'o');
+                    statusDisplay.classList.add('status', 'draw');
                     gameActive = false;
                     drawWinLine(winIndex);
+                    showResetButton();
                     return;
                 }
                 // If all 9 cells are filled (regardless of how many are visible), it's a draw
                 if (allMoves.filter(move => move.visible).length === 0 || !gameState.includes('')) {
-                    statusDisplay.textContent = "Game ended in a draw!";
+                    statusDisplay.textContent = "Draw!";
+                    statusDisplay.classList.remove('x', 'o');
+                    statusDisplay.classList.add('status', 'draw');
                     gameActive = false;
+                    showResetButton();
                     return;
                 }
                 currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-                statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+                statusDisplay.textContent = `${currentPlayer}'s turn`;
+                statusDisplay.classList.remove('x', 'o', 'draw');
+                statusDisplay.classList.add('status', currentPlayer.toLowerCase());
             }
 
             function coordsForCell(cellIndex) {
@@ -252,14 +296,10 @@
             }
 
             function drawWinLine(winIndex) {
-                // Remove any previous line
                 if (winLineElement) {
                     winLineElement.remove();
                 }
-                // Which cells does this win use?
                 const [startCellIdx, endCellIdx] = winLineMap[winIndex];
-
-                // Use setTimeout to ensure DOM is fully rendered before getting positions
                 setTimeout(() => {
                     const start = coordsForCell(startCellIdx);
                     const end = coordsForCell(endCellIdx);
@@ -273,11 +313,11 @@
                     winLineElement.className = 'win-line';
                     winLineElement.style.width = `${length}px`;
                     winLineElement.style.left = `${start.x}px`;
-                    winLineElement.style.top = `${start.y - 4}px`; // -4px to center line vertically
+                    winLineElement.style.top = `${start.y - 11}px`;
                     winLineElement.style.transform = `rotate(${angle}deg)`;
                     winLineElement.style.transformOrigin = '0 50%';
                     board.appendChild(winLineElement);
-                }, 30);
+                }, 40);
             }
 
             function resetGame() {
@@ -286,7 +326,9 @@
                 gameActive = true;
                 allMoves = [];
                 moveCount = 0;
-                statusDisplay.textContent = `Player ${currentPlayer}'s turn`;
+                statusDisplay.textContent = `X's turn`;
+                statusDisplay.classList.remove('o', 'draw');
+                statusDisplay.classList.add('x');
                 document.querySelectorAll('.cell').forEach(cell => {
                     cell.innerHTML = '';
                 });
@@ -294,10 +336,19 @@
                     winLineElement.remove();
                     winLineElement = null;
                 }
+                hideResetButton();
+            }
+
+            function showResetButton() {
+                resetButton.classList.add('show');
+            }
+            function hideResetButton() {
+                resetButton.classList.remove('show');
             }
 
             resetButton.addEventListener('click', resetGame);
             initializeBoard();
+            hideResetButton();
         });
     </script>
 </body>
