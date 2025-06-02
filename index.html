@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe - Large</title>
+    <title>Tic Tac Toe - Large (Reduced 20%)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,22 +12,20 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 70px;
+            margin-top: 56px; /* 70 * 0.8 */
         }
-
         .game-title {
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100vw;
-            margin-bottom: 30px;
+            margin-bottom: 24px; /* 30 * 0.8 */
             margin-top: 0;
         }
-
         .game-title-text {
-            font-size: 3.2em;
+            font-size: 2.56em; /* 3.2 * 0.8 */
             font-weight: bold;
-            letter-spacing: 6px;
+            letter-spacing: 4.8px; /* 6 * 0.8 */
             background: linear-gradient(90deg,#4fa3ff 0%, #ffe066 50%, #ff4f4f 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -36,112 +34,93 @@
             text-align: center;
             margin: 0;
         }
-
+        .status {
+            margin: 32px 0 20px 0; /* 40, 25 * 0.8 */
+            font-size: 32px; /* 40 * 0.8 */
+            font-weight: bold;
+            letter-spacing: 0.8px; /* 1 * 0.8 */
+            min-height: 38.4px; /* 48 * 0.8 */
+            text-shadow: 0 0 12.8px #222, 0 0 3.2px #444;
+            text-align: center;
+        }
+        .status.x {
+            color: #4fa3ff;
+            text-shadow: 0 0 12.8px #294e7a, 0 0 1.6px #222;
+        }
+        .status.o {
+            color: #ff4f4f;
+            text-shadow: 0 0 12.8px #7a2929, 0 0 1.6px #222;
+        }
+        .status.draw {
+            color: #ffe066;
+            text-shadow: 0 0 12.8px #764d00;
+        }
         .board {
             display: grid;
-            grid-template-columns: repeat(3, 220px);
-            grid-template-rows: repeat(3, 220px);
-            gap: 18px;
-            margin: 40px 0;
+            grid-template-columns: repeat(3, 176px);
+            grid-template-rows: repeat(3, 176px);
+            gap: 14.4px;
+            margin: 32px 0;
             position: relative;
         }
-
         .cell {
-            width: 220px;
-            height: 220px;
+            width: 176px;
+            height: 176px;
             background-color: #23293a;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 120px;
+            font-size: 96px;
             cursor: pointer;
-            border-radius: 16px;
+            border-radius: 12.8px;
             transition: all 0.3s ease;
             position: relative;
             z-index: 1;
             box-shadow: 0 8px 32px #10131a44;
         }
-
         .cell:hover {
             background-color: #1b2233;
         }
-
         .mark {
             position: absolute;
             transition: opacity 0.5s, color 0.4s;
             z-index: 2;
             user-select: none;
-            font-size: 150px;
+            font-size: 120px;
             line-height: 1;
         }
-
         .mark.x-mark {
             color: #4fa3ff;
-            text-shadow: 0 0 18px #294e7a;
+            text-shadow: 0 0 14.4px #294e7a;
         }
-
         .mark.o-mark {
             color: #ff4f4f;
-            text-shadow: 0 0 18px #7a2929;
+            text-shadow: 0 0 14.4px #7a2929;
         }
-
-        .transparent {
-            opacity: 0.18;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .status {
-            margin: 40px 0 25px 0;
-            font-size: 40px;
-            font-weight: bold;
-            letter-spacing: 1px;
-            min-height: 48px;
-            text-shadow: 0 0 16px #222, 0 0 4px #444;
-            text-align: center;
-        }
-
-        .status.x {
-            color: #4fa3ff;
-            text-shadow: 0 0 16px #294e7a, 0 0 2px #222;
-        }
-        .status.o {
-            color: #ff4f4f;
-            text-shadow: 0 0 16px #7a2929, 0 0 2px #222;
-        }
-        .status.draw {
-            color: #ffe066;
-            text-shadow: 0 0 16px #764d00;
-        }
-
+        .transparent { opacity: 0.18; }
+        .hidden { display: none; }
         button {
-            padding: 18px 44px;
-            font-size: 28px;
+            padding: 14.4px 35.2px;
+            font-size: 22.4px;
             background-color: #384e70;
             color: white;
             border: none;
-            border-radius: 9px;
+            border-radius: 7.2px;
             cursor: pointer;
-            margin-top: 12px;
-            margin-bottom: 40px;
+            margin-top: 9.6px;
+            margin-bottom: 32px;
             box-shadow: 0 2px 8px #111a2a55;
-            display: none; /* Start hidden */
+            display: none;
         }
-
-        button.show {
-            display: block !important;
-        }
-
+        button.show { display: block !important; }
         .win-line {
             position: absolute;
             background: #ffe066;
-            height: 22px;
-            border-radius: 11px;
+            height: 17.6px;
+            border-radius: 8.8px;
             z-index: 10;
             pointer-events: none;
-            box-shadow: 0 0 36px 8px #ffe066cc;
+            box-shadow: 0 0 28.8px 6.4px #ffe066cc;
             transform-origin: 0 50%;
         }
     </style>
@@ -153,13 +132,11 @@
     <div class="status x" id="status">X's turn</div>
     <div class="board" id="board"></div>
     <button id="reset">New Game</button>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const board = document.getElementById('board');
             const statusDisplay = document.getElementById('status');
             const resetButton = document.getElementById('reset');
-
             let gameState = ['', '', '', '', '', '', '', '', ''];
             let currentPlayer = 'X';
             let gameActive = true;
@@ -167,7 +144,6 @@
             let moveCount = 0;
             let winLineElement = null;
 
-            // Winning conditions and win line mapping
             const winningConditions = [
                 [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
                 [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
@@ -189,20 +165,12 @@
                     board.appendChild(cell);
                 }
             }
-
             function handleCellClick(e) {
                 const clickedCell = e.target;
                 const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
-                if (gameState[clickedCellIndex] !== '' || !gameActive) {
-                    return;
-                }
+                if (gameState[clickedCellIndex] !== '' || !gameActive) return;
                 const mark = document.createElement('span');
-                mark.classList.add('mark');
-                if (currentPlayer === 'X') {
-                    mark.classList.add('x-mark');
-                } else {
-                    mark.classList.add('o-mark');
-                }
+                mark.classList.add('mark', currentPlayer === 'X' ? 'x-mark' : 'o-mark');
                 mark.textContent = currentPlayer;
                 clickedCell.appendChild(mark);
                 gameState[clickedCellIndex] = currentPlayer;
@@ -216,50 +184,29 @@
                 handleDisappearingMoves();
                 checkResult();
             }
-
             function handleDisappearingMoves() {
-                // Only keep the most recent 7 visible marks
                 const visibleMoves = allMoves.filter(move => move.visible);
-
-                // Reset all transparency and hidden on all visible moves
-                visibleMoves.forEach(move => {
-                    move.element.classList.remove('transparent', 'hidden');
-                });
-
+                visibleMoves.forEach(move => move.element.classList.remove('transparent', 'hidden'));
                 if (moveCount <= 7) {
-                    if (moveCount === 7 && visibleMoves.length > 0) {
-                        visibleMoves[0].element.classList.add('transparent');
-                    }
+                    if (moveCount === 7 && visibleMoves.length > 0) visibleMoves[0].element.classList.add('transparent');
                     return;
                 }
-
-                // For moves 8 and onward, hide the oldest visible mark, and make the next-to-hide transparent
                 const toHide = visibleMoves.length - 7;
                 for (let i = 0; i < toHide; i++) {
                     visibleMoves[i].element.classList.add('hidden');
                     visibleMoves[i].visible = false;
                     gameState[visibleMoves[i].index] = '';
                 }
-
-                // Make the next-to-hide mark transparent (if it exists)
                 const updatedVisibleMoves = allMoves.filter(move => move.visible);
-                if (updatedVisibleMoves.length > 0) {
-                    updatedVisibleMoves[0].element.classList.add('transparent');
-                }
+                if (updatedVisibleMoves.length > 0) updatedVisibleMoves[0].element.classList.add('transparent');
             }
-
             function checkResult() {
-                let roundWon = false;
-                let winIndex = -1;
+                let roundWon = false, winIndex = -1;
                 for (let i = 0; i < winningConditions.length; i++) {
                     const [a, b, c] = winningConditions[i];
-                    if (gameState[a] === '' || gameState[b] === '' || gameState[c] === '') {
-                        continue;
-                    }
+                    if (gameState[a] === '' || gameState[b] === '' || gameState[c] === '') continue;
                     if (gameState[a] === gameState[b] && gameState[b] === gameState[c]) {
-                        roundWon = true;
-                        winIndex = i;
-                        break;
+                        roundWon = true; winIndex = i; break;
                     }
                 }
                 if (roundWon) {
@@ -271,7 +218,6 @@
                     showResetButton();
                     return;
                 }
-                // If all 9 cells are filled (regardless of how many are visible), it's a draw
                 if (allMoves.filter(move => move.visible).length === 0 || !gameState.includes('')) {
                     statusDisplay.textContent = "Draw!";
                     statusDisplay.classList.remove('x', 'o');
@@ -285,41 +231,33 @@
                 statusDisplay.classList.remove('x', 'o', 'draw');
                 statusDisplay.classList.add('status', currentPlayer.toLowerCase());
             }
-
             function coordsForCell(cellIndex) {
-                // Use offsetLeft/Top relative to .board and add half cell size
                 const cell = board.children[cellIndex];
                 return {
                     x: cell.offsetLeft + cell.offsetWidth / 2,
                     y: cell.offsetTop + cell.offsetHeight / 2
                 };
             }
-
             function drawWinLine(winIndex) {
-                if (winLineElement) {
-                    winLineElement.remove();
-                }
+                if (winLineElement) winLineElement.remove();
                 const [startCellIdx, endCellIdx] = winLineMap[winIndex];
                 setTimeout(() => {
                     const start = coordsForCell(startCellIdx);
                     const end = coordsForCell(endCellIdx);
-
                     const dx = end.x - start.x;
                     const dy = end.y - start.y;
                     const length = Math.sqrt(dx * dx + dy * dy);
                     const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-
                     winLineElement = document.createElement('div');
                     winLineElement.className = 'win-line';
                     winLineElement.style.width = `${length}px`;
                     winLineElement.style.left = `${start.x}px`;
-                    winLineElement.style.top = `${start.y - 11}px`;
+                    winLineElement.style.top = `${start.y - 8.8}px`;
                     winLineElement.style.transform = `rotate(${angle}deg)`;
                     winLineElement.style.transformOrigin = '0 50%';
                     board.appendChild(winLineElement);
                 }, 40);
             }
-
             function resetGame() {
                 gameState = ['', '', '', '', '', '', '', '', ''];
                 currentPlayer = 'X';
@@ -332,20 +270,11 @@
                 document.querySelectorAll('.cell').forEach(cell => {
                     cell.innerHTML = '';
                 });
-                if (winLineElement) {
-                    winLineElement.remove();
-                    winLineElement = null;
-                }
+                if (winLineElement) { winLineElement.remove(); winLineElement = null; }
                 hideResetButton();
             }
-
-            function showResetButton() {
-                resetButton.classList.add('show');
-            }
-            function hideResetButton() {
-                resetButton.classList.remove('show');
-            }
-
+            function showResetButton() { resetButton.classList.add('show'); }
+            function hideResetButton() { resetButton.classList.remove('show'); }
             resetButton.addEventListener('click', resetGame);
             initializeBoard();
             hideResetButton();
