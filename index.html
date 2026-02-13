@@ -123,6 +123,50 @@
             box-shadow: 0 0 28.8px 6.4px #ffe066cc;
             transform-origin: 0 50%;
         }
+
+        /* Mobile Responsive - 25% reduction (multiply by 0.75) */
+        @media (max-width: 576px) {
+            body {
+                margin-top: 42px; /* 56 * 0.75 */
+            }
+            .game-title {
+                margin-bottom: 18px; /* 24 * 0.75 */
+            }
+            .game-title-text {
+                font-size: 1.92em; /* 2.56 * 0.75 */
+                letter-spacing: 3.6px; /* 4.8 * 0.75 */
+            }
+            .status {
+                margin: 24px 0 15px 0; /* 32, 20 * 0.75 */
+                font-size: 24px; /* 32 * 0.75 */
+                letter-spacing: 0.6px; /* 0.8 * 0.75 */
+                min-height: 28.8px; /* 38.4 * 0.75 */
+            }
+            .board {
+                grid-template-columns: repeat(3, 132px);
+                grid-template-rows: repeat(3, 132px);
+                gap: 10.8px; /* 14.4 * 0.75 */
+                margin: 24px 0; /* 32 * 0.75 */
+            }
+            .cell {
+                width: 132px;
+                height: 132px;
+                font-size: 72px; /* 96 * 0.75 */
+                border-radius: 9.6px; /* 12.8 * 0.75 */
+            }
+            .mark {
+                font-size: 90px; /* 120 * 0.75 */
+            }
+            button {
+                padding: 10.8px 26.4px; /* 14.4, 35.2 * 0.75 */
+                font-size: 16.8px; /* 22.4 * 0.75 */
+                margin-top: 7.2px; /* 9.6 * 0.75 */
+                margin-bottom: 24px; /* 32 * 0.75 */
+            }
+            .win-line {
+                height: 13.2px; /* 17.6 * 0.75 */
+            }
+        }
     </style>
 </head>
 <body>
