@@ -1,328 +1,638 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tic Tac Toe - Large (Reduced 20%)</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #181c24;
-            color: #f5f8fa;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 56px; /* 70 * 0.8 */
-        }
-        .game-title {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100vw;
-            margin-bottom: 24px; /* 30 * 0.8 */
-            margin-top: 0;
-        }
-        .game-title-text {
-            font-size: 2.56em; /* 3.2 * 0.8 */
-            font-weight: bold;
-            letter-spacing: 4.8px; /* 6 * 0.8 */
-            background: linear-gradient(90deg,#4fa3ff 0%, #ffe066 50%, #ff4f4f 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-fill-color: transparent;
-            text-align: center;
-            margin: 0;
-        }
-        .status {
-            margin: 32px 0 20px 0; /* 40, 25 * 0.8 */
-            font-size: 32px; /* 40 * 0.8 */
-            font-weight: bold;
-            letter-spacing: 0.8px; /* 1 * 0.8 */
-            min-height: 38.4px; /* 48 * 0.8 */
-            text-shadow: 0 0 12.8px #222, 0 0 3.2px #444;
-            text-align: center;
-        }
-        .status.x {
-            color: #4fa3ff;
-            text-shadow: 0 0 12.8px #294e7a, 0 0 1.6px #222;
-        }
-        .status.o {
-            color: #ff4f4f;
-            text-shadow: 0 0 12.8px #7a2929, 0 0 1.6px #222;
-        }
-        .status.draw {
-            color: #ffe066;
-            text-shadow: 0 0 12.8px #764d00;
-        }
-        .board {
-            display: grid;
-            grid-template-columns: repeat(3, 176px);
-            grid-template-rows: repeat(3, 176px);
-            gap: 14.4px;
-            margin: 32px 0;
-            position: relative;
-        }
-        .cell {
-            width: 176px;
-            height: 176px;
-            background-color: #23293a;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 96px;
-            cursor: pointer;
-            border-radius: 12.8px;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-            box-shadow: 0 8px 32px #10131a44;
-        }
-        .cell:hover {
-            background-color: #1b2233;
-        }
-        .mark {
-            position: absolute;
-            transition: opacity 0.5s, color 0.4s;
-            z-index: 2;
-            user-select: none;
-            font-size: 120px;
-            line-height: 1;
-        }
-        .mark.x-mark {
-            color: #4fa3ff;
-            text-shadow: 0 0 14.4px #294e7a;
-        }
-        .mark.o-mark {
-            color: #ff4f4f;
-            text-shadow: 0 0 14.4px #7a2929;
-        }
-        .transparent { opacity: 0.18; }
-        .hidden { display: none; }
-        button {
-            padding: 14.4px 35.2px;
-            font-size: 22.4px;
-            background-color: #384e70;
-            color: white;
-            border: none;
-            border-radius: 7.2px;
-            cursor: pointer;
-            margin-top: 9.6px;
-            margin-bottom: 32px;
-            box-shadow: 0 2px 8px #111a2a55;
-            display: none;
-        }
-        button.show { display: block !important; }
-        .win-line {
-            position: absolute;
-            background: #ffe066;
-            height: 17.6px;
-            border-radius: 8.8px;
-            z-index: 10;
-            pointer-events: none;
-            box-shadow: 0 0 28.8px 6.4px #ffe066cc;
-            transform-origin: 0 50%;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic Tac Toe</title>
+<style>
+  * { box-sizing: border-box; }
 
-        /* Mobile Responsive - 10% reduction (multiply by 0.9) */
-        @media (max-width: 576px) {
-            body {
-                margin-top: 50.4px; /* 56 * 0.9 */
-            }
-            .game-title {
-                margin-bottom: 21.6px; /* 24 * 0.9 */
-            }
-            .game-title-text {
-                font-size: 2.304em; /* 2.56 * 0.9 */
-                letter-spacing: 4.32px; /* 4.8 * 0.9 */
-            }
-            .status {
-                margin: 28.8px 0 18px 0; /* 32, 20 * 0.9 */
-                font-size: 28.8px; /* 32 * 0.9 */
-                letter-spacing: 0.72px; /* 0.8 * 0.9 */
-                min-height: 34.56px; /* 38.4 * 0.9 */
-            }
-            .board {
-                grid-template-columns: repeat(3, 158.4px);
-                grid-template-rows: repeat(3, 158.4px);
-                gap: 12.96px; /* 14.4 * 0.9 */
-                margin: 28.8px 0; /* 32 * 0.9 */
-            }
-            .cell {
-                width: 158.4px;
-                height: 158.4px;
-                font-size: 86.4px; /* 96 * 0.9 */
-                border-radius: 11.52px; /* 12.8 * 0.9 */
-            }
-            .mark {
-                font-size: 108px; /* 120 * 0.9 */
-            }
-            button {
-                padding: 12.96px 31.68px; /* 14.4, 35.2 * 0.9 */
-                font-size: 20.16px; /* 22.4 * 0.9 */
-                margin-top: 8.64px; /* 9.6 * 0.9 */
-                margin-bottom: 28.8px; /* 32 * 0.9 */
-            }
-            .win-line {
-                height: 15.84px; /* 17.6 * 0.9 */
-            }
-        }
-    </style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #181c24;
+    color: #f5f8fa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    padding: 40px 16px 60px;
+    min-height: 100vh;
+  }
+
+  /* ── Title ── */
+  .game-title-text {
+    font-size: 2.56em;
+    font-weight: bold;
+    letter-spacing: 4.8px;
+    background: linear-gradient(90deg,#4fa3ff 0%, #ffe066 50%, #ff4f4f 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+    margin: 0 0 8px;
+  }
+
+  /* ── Scoreboard ── */
+  .scoreboard {
+    display: flex;
+    gap: 12px;
+    margin: 12px 0 6px;
+    align-items: stretch;
+  }
+
+  .score-card {
+    background: #23293a;
+    border-radius: 10px;
+    padding: 10px 20px;
+    text-align: center;
+    min-width: 72px;
+    box-shadow: 0 4px 16px #10131a44;
+  }
+
+  .score-card.x-card { border-top: 3px solid #4fa3ff; }
+  .score-card.draw-card { border-top: 3px solid #ffe066; min-width: 60px; }
+  .score-card.o-card { border-top: 3px solid #ff4f4f; }
+
+  .score-label {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.55;
+    margin-bottom: 4px;
+  }
+
+  .score-value {
+    font-size: 28px;
+    font-weight: bold;
+    line-height: 1;
+  }
+
+  .score-card.x-card .score-value { color: #4fa3ff; }
+  .score-card.draw-card .score-value { color: #ffe066; }
+  .score-card.o-card .score-value { color: #ff4f4f; }
+
+  /* ── Status ── */
+  .status {
+    margin: 20px 0 8px;
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 0.8px;
+    min-height: 36px;
+    text-align: center;
+  }
+  .status.x    { color: #4fa3ff; }
+  .status.o    { color: #ff4f4f; }
+  .status.draw { color: #ffe066; }
+
+  /* ── Move counter ── */
+  .move-counter {
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    opacity: 0.45;
+    margin: 0 0 14px;
+    text-align: center;
+  }
+  .move-counter span {
+    color: #f5f8fa;
+    opacity: 1;
+    font-weight: bold;
+    font-size: 15px;
+  }
+
+  /* ── Board ── */
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 160px);
+    grid-template-rows: repeat(3, 160px);
+    gap: 13px;
+    margin: 20px 0 10px;
+    position: relative;
+  }
+
+  .cell {
+    width: 160px;
+    height: 160px;
+    background-color: #23293a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: background 0.2s;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 6px 24px #10131a44;
+  }
+
+  .cell:hover { background-color: #1b2233; }
+
+  .mark {
+    position: absolute;
+    font-size: 108px;
+    line-height: 1;
+    user-select: none;
+    transition: opacity 0.4s;
+    z-index: 2;
+  }
+  .mark.x-mark { color: #4fa3ff; text-shadow: 0 0 14px #294e7a; }
+  .mark.o-mark { color: #ff4f4f; text-shadow: 0 0 14px #7a2929; }
+  .transparent { opacity: 0.18; }
+  .hidden { display: none; }
+
+  /* ── Win line ── */
+  .win-line {
+    position: absolute;
+    background: #ffe066;
+    height: 16px;
+    border-radius: 8px;
+    z-index: 10;
+    pointer-events: none;
+    box-shadow: 0 0 26px 6px #ffe066bb;
+    transform-origin: 0 50%;
+  }
+
+  /* ── Buttons ── */
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  button {
+    padding: 12px 28px;
+    font-size: 18px;
+    background-color: #384e70;
+    color: white;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px #111a2a55;
+    transition: background 0.2s;
+  }
+  button:hover { background-color: #4a65a0; }
+
+  #reset { display: none; }
+  #reset.show { display: block; }
+
+  #clear-scores {
+    background-color: #3a2323;
+    font-size: 14px;
+    padding: 8px 16px;
+  }
+  #clear-scores:hover { background-color: #5a2e2e; }
+
+  /* ── Highscore panel ── */
+  .highscore-section {
+    margin-top: 28px;
+    width: 100%;
+    max-width: 540px;
+  }
+
+  .highscore-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .highscore-title {
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    opacity: 0.5;
+  }
+
+  .highscore-list {
+    background: #1e2333;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px #10131a44;
+  }
+
+  .hs-row {
+    display: flex;
+    align-items: center;
+    padding: 9px 16px;
+    gap: 12px;
+    border-bottom: 1px solid #2a3048;
+    font-size: 14px;
+  }
+  .hs-row:last-child { border-bottom: none; }
+  .hs-row.header-row { opacity: 0.45; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+
+  .hs-rank  { width: 28px; text-align: center; font-weight: bold; opacity: 0.5; }
+  .hs-player { flex: 1; font-weight: bold; }
+  .hs-wins  { width: 44px; text-align: center; }
+  .hs-win-rate { width: 56px; text-align: center; opacity: 0.65; }
+
+  .hs-row .hs-player.x-col { color: #4fa3ff; }
+  .hs-row .hs-player.o-col { color: #ff4f4f; }
+
+  .crown { margin-right: 4px; }
+
+  .empty-hs {
+    text-align: center;
+    padding: 20px;
+    opacity: 0.4;
+    font-size: 13px;
+  }
+
+  /* ── Session badge ── */
+  .session-info {
+    font-size: 12px;
+    opacity: 0.35;
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Shake animations — rhythmic patterns that cycle ── */
+  /* Pattern 1: short-short (tick-tick) */
+  @keyframes shake1 {
+    0%,100% { transform: translate(0,0) rotate(0deg); }
+    20%      { transform: translate(-4px, 2px) rotate(-0.5deg); }
+    40%      { transform: translate(4px, -2px) rotate(0.5deg); }
+    60%      { transform: translate(-3px, 1px) rotate(-0.3deg); }
+    80%      { transform: translate(3px, -1px) rotate(0.3deg); }
+  }
+  /* Pattern 2: long-settle (thud) */
+  @keyframes shake2 {
+    0%,100% { transform: translate(0,0) rotate(0deg); }
+    15%     { transform: translate(-7px, 3px) rotate(-1deg); }
+    30%     { transform: translate(7px, -3px) rotate(1deg); }
+    45%     { transform: translate(-5px, 2px) rotate(-0.6deg); }
+    60%     { transform: translate(4px, -1px) rotate(0.4deg); }
+    78%     { transform: translate(-2px, 1px) rotate(-0.2deg); }
+  }
+  /* Pattern 3: stutter (rat-tat-tat) */
+  @keyframes shake3 {
+    0%,100% { transform: translate(0,0); }
+    10%     { transform: translate(-5px, 0); }
+    20%     { transform: translate(5px, 0); }
+    30%     { transform: translate(-5px, 0); }
+    40%     { transform: translate(4px, 0); }
+    50%     { transform: translate(-3px, 0); }
+    65%     { transform: translate(3px, 0); }
+    80%     { transform: translate(-1px, 0); }
+  }
+  /* Pattern 4: drop-bounce (boom-bop) */
+  @keyframes shake4 {
+    0%,100% { transform: translate(0,0) rotate(0deg); }
+    10%     { transform: translate(0, -6px) rotate(0.8deg); }
+    25%     { transform: translate(0, 5px) rotate(-0.8deg); }
+    40%     { transform: translate(-4px, -3px) rotate(0.4deg); }
+    55%     { transform: translate(4px, 2px) rotate(-0.4deg); }
+    70%     { transform: translate(-2px, -1px) rotate(0.2deg); }
+    85%     { transform: translate(1px, 1px) rotate(0deg); }
+  }
+
+  .shake1 { animation: shake1 0.28s ease-out; }
+  .shake2 { animation: shake2 0.38s ease-out; }
+  .shake3 { animation: shake3 0.30s ease-out; }
+  .shake4 { animation: shake4 0.40s ease-out; }
+
+  /* ── Mobile ── */
+  @media (max-width: 560px) {
+    .board {
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 9px;
+    }
+    .cell { width: 100px; height: 100px; }
+    .mark { font-size: 68px; }
+    .game-title-text { font-size: 1.9em; }
+    .score-card { padding: 8px 12px; min-width: 58px; }
+    .score-value { font-size: 22px; }
+  }
+</style>
 </head>
 <body>
-    <div class="game-title">
-        <h1 class="game-title-text">TIC TAC TOE</h1>
-    </div>
-    <div class="status x" id="status">X's turn</div>
-    <div class="board" id="board"></div>
-    <button id="reset">New Game</button>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const board = document.getElementById('board');
-            const statusDisplay = document.getElementById('status');
-            const resetButton = document.getElementById('reset');
-            let gameState = ['', '', '', '', '', '', '', '', ''];
-            let currentPlayer = 'X';
-            let gameActive = true;
-            let allMoves = [];
-            let moveCount = 0;
-            let winLineElement = null;
 
-            const winningConditions = [
-                [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
-                [0, 3, 6], [1, 4, 7], [2, 5, 8], // columns
-                [0, 4, 8], [2, 4, 6]             // diagonals
-            ];
-            const winLineMap = [
-                [0, 2], [3, 5], [6, 8], // rows
-                [0, 6], [1, 7], [2, 8], // columns
-                [0, 8], [2, 6]          // diagonals
-            ];
+<h1 class="game-title-text">TIC TAC TOE</h1>
 
-            function initializeBoard() {
-                board.innerHTML = '';
-                for (let i = 0; i < 9; i++) {
-                    const cell = document.createElement('div');
-                    cell.classList.add('cell');
-                    cell.setAttribute('data-index', i);
-                    cell.addEventListener('click', handleCellClick);
-                    board.appendChild(cell);
-                }
-            }
-            function handleCellClick(e) {
-                const clickedCell = e.target;
-                const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
-                if (gameState[clickedCellIndex] !== '' || !gameActive) return;
-                const mark = document.createElement('span');
-                mark.classList.add('mark', currentPlayer === 'X' ? 'x-mark' : 'o-mark');
-                mark.textContent = currentPlayer;
-                clickedCell.appendChild(mark);
-                gameState[clickedCellIndex] = currentPlayer;
-                allMoves.push({
-                    index: clickedCellIndex,
-                    player: currentPlayer,
-                    element: mark,
-                    visible: true
-                });
-                moveCount++;
-                handleDisappearingMoves();
-                checkResult();
-            }
-            function handleDisappearingMoves() {
-                const visibleMoves = allMoves.filter(move => move.visible);
-                visibleMoves.forEach(move => move.element.classList.remove('transparent', 'hidden'));
-                if (moveCount <= 7) {
-                    if (moveCount === 7 && visibleMoves.length > 0) visibleMoves[0].element.classList.add('transparent');
-                    return;
-                }
-                const toHide = visibleMoves.length - 7;
-                for (let i = 0; i < toHide; i++) {
-                    visibleMoves[i].element.classList.add('hidden');
-                    visibleMoves[i].visible = false;
-                    gameState[visibleMoves[i].index] = '';
-                }
-                const updatedVisibleMoves = allMoves.filter(move => move.visible);
-                if (updatedVisibleMoves.length > 0) updatedVisibleMoves[0].element.classList.add('transparent');
-            }
-            function checkResult() {
-                let roundWon = false, winIndex = -1;
-                for (let i = 0; i < winningConditions.length; i++) {
-                    const [a, b, c] = winningConditions[i];
-                    if (gameState[a] === '' || gameState[b] === '' || gameState[c] === '') continue;
-                    if (gameState[a] === gameState[b] && gameState[b] === gameState[c]) {
-                        roundWon = true; winIndex = i; break;
-                    }
-                }
-                if (roundWon) {
-                    statusDisplay.textContent = `${currentPlayer} wins!`;
-                    statusDisplay.classList.remove('x', 'o');
-                    statusDisplay.classList.add('status', 'draw');
-                    gameActive = false;
-                    drawWinLine(winIndex);
-                    showResetButton();
-                    return;
-                }
-                if (allMoves.filter(move => move.visible).length === 0 || !gameState.includes('')) {
-                    statusDisplay.textContent = "Draw!";
-                    statusDisplay.classList.remove('x', 'o');
-                    statusDisplay.classList.add('status', 'draw');
-                    gameActive = false;
-                    showResetButton();
-                    return;
-                }
-                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-                statusDisplay.textContent = `${currentPlayer}'s turn`;
-                statusDisplay.classList.remove('x', 'o', 'draw');
-                statusDisplay.classList.add('status', currentPlayer.toLowerCase());
-            }
-            function coordsForCell(cellIndex) {
-                const cell = board.children[cellIndex];
-                return {
-                    x: cell.offsetLeft + cell.offsetWidth / 2,
-                    y: cell.offsetTop + cell.offsetHeight / 2
-                };
-            }
-            function drawWinLine(winIndex) {
-                if (winLineElement) winLineElement.remove();
-                const [startCellIdx, endCellIdx] = winLineMap[winIndex];
-                setTimeout(() => {
-                    const start = coordsForCell(startCellIdx);
-                    const end = coordsForCell(endCellIdx);
-                    const dx = end.x - start.x;
-                    const dy = end.y - start.y;
-                    const length = Math.sqrt(dx * dx + dy * dy);
-                    const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-                    winLineElement = document.createElement('div');
-                    winLineElement.className = 'win-line';
-                    winLineElement.style.width = `${length}px`;
-                    winLineElement.style.left = `${start.x}px`;
-                    winLineElement.style.top = `${start.y - 8.8}px`;
-                    winLineElement.style.transform = `rotate(${angle}deg)`;
-                    winLineElement.style.transformOrigin = '0 50%';
-                    board.appendChild(winLineElement);
-                }, 40);
-            }
-            function resetGame() {
-                gameState = ['', '', '', '', '', '', '', '', ''];
-                currentPlayer = 'X';
-                gameActive = true;
-                allMoves = [];
-                moveCount = 0;
-                statusDisplay.textContent = `X's turn`;
-                statusDisplay.classList.remove('o', 'draw');
-                statusDisplay.classList.add('x');
-                document.querySelectorAll('.cell').forEach(cell => {
-                    cell.innerHTML = '';
-                });
-                if (winLineElement) { winLineElement.remove(); winLineElement = null; }
-                hideResetButton();
-            }
-            function showResetButton() { resetButton.classList.add('show'); }
-            function hideResetButton() { resetButton.classList.remove('show'); }
-            resetButton.addEventListener('click', resetGame);
-            initializeBoard();
-            hideResetButton();
-        });
-    </script>
+<!-- Session scoreboard -->
+<div class="scoreboard">
+  <div class="score-card x-card">
+    <div class="score-label">X Wins</div>
+    <div class="score-value" id="score-x">0</div>
+  </div>
+  <div class="score-card draw-card">
+    <div class="score-label">Draws</div>
+    <div class="score-value" id="score-draw">0</div>
+  </div>
+  <div class="score-card o-card">
+    <div class="score-label">O Wins</div>
+    <div class="score-value" id="score-o">0</div>
+  </div>
+</div>
+
+<div class="status x" id="status">X's turn</div>
+<div class="move-counter">Moves: <span id="move-count">0</span></div>
+
+<div class="board" id="board"></div>
+
+<div class="btn-row">
+  <button id="reset">New Game</button>
+</div>
+
+<!-- Highscore section -->
+<div class="highscore-section">
+  <div class="highscore-header">
+    <span class="highscore-title">🏆 Highscores — This Session</span>
+    <button id="clear-scores">Reset All</button>
+  </div>
+  <div class="highscore-list" id="highscore-list">
+    <div class="empty-hs">No games played yet</div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const boardEl        = document.getElementById('board');
+  const statusDisplay  = document.getElementById('status');
+  const resetButton    = document.getElementById('reset');
+  const clearButton    = document.getElementById('clear-scores');
+  const scoreXEl       = document.getElementById('score-x');
+  const scoreOEl       = document.getElementById('score-o');
+  const scoreDrawEl    = document.getElementById('score-draw');
+  const highscoreList  = document.getElementById('highscore-list');
+  const moveCountEl    = document.getElementById('move-count');
+
+  // ── State ──
+  let gameState   = ['','','','','','','','',''];
+  let currentPlayer = 'X';
+  let gameActive  = true;
+  let allMoves    = [];
+  let moveCount   = 0;
+  let winLineEl   = null;
+
+  // Score tracking
+  let scores = { X: 0, O: 0, Draw: 0 };
+  let gamesPlayed = 0;
+  // Highscore: { player, wins, games }[] — ranked by wins desc
+  let highscores = [
+    { player: 'X', wins: 0, games: 0 },
+    { player: 'O', wins: 0, games: 0 },
+  ];
+
+  const winningConditions = [
+    [0,1,2],[3,4,5],[6,7,8],
+    [0,3,6],[1,4,7],[2,5,8],
+    [0,4,8],[2,4,6]
+  ];
+  const winLineMap = [
+    [0,2],[3,5],[6,8],
+    [0,6],[1,7],[2,8],
+    [0,8],[2,6]
+  ];
+
+  // ── Board init ──
+  function initializeBoard() {
+    boardEl.innerHTML = '';
+    for (let i = 0; i < 9; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.dataset.index = i;
+      cell.addEventListener('click', handleCellClick);
+      boardEl.appendChild(cell);
+    }
+  }
+
+  function handleCellClick(e) {
+    const cell  = e.currentTarget;
+    const idx   = parseInt(cell.dataset.index);
+    if (gameState[idx] !== '' || !gameActive) return;
+
+    const mark = document.createElement('span');
+    mark.classList.add('mark', currentPlayer === 'X' ? 'x-mark' : 'o-mark');
+    mark.textContent = currentPlayer;
+    cell.appendChild(mark);
+
+    gameState[idx] = currentPlayer;
+    allMoves.push({ index: idx, player: currentPlayer, element: mark, visible: true });
+    moveCount++;
+    moveCountEl.textContent = moveCount;
+
+    // ── Rhythmic shake + haptic vibration ──
+    triggerShake();
+    triggerVibration();
+
+    handleDisappearingMoves();
+    checkResult();
+  }
+
+  function handleDisappearingMoves() {
+    const visible = allMoves.filter(m => m.visible);
+    visible.forEach(m => m.element.classList.remove('transparent', 'hidden'));
+
+    if (moveCount <= 7) {
+      if (moveCount === 7 && visible.length > 0)
+        visible[0].element.classList.add('transparent');
+      return;
+    }
+
+    const toHide = visible.length - 7;
+    for (let i = 0; i < toHide; i++) {
+      visible[i].element.classList.add('hidden');
+      visible[i].visible = false;
+      gameState[visible[i].index] = '';
+    }
+    const updated = allMoves.filter(m => m.visible);
+    if (updated.length > 0) updated[0].element.classList.add('transparent');
+  }
+
+  function checkResult() {
+    let roundWon = false, winIdx = -1;
+    for (let i = 0; i < winningConditions.length; i++) {
+      const [a,b,c] = winningConditions[i];
+      if (!gameState[a] || !gameState[b] || !gameState[c]) continue;
+      if (gameState[a] === gameState[b] && gameState[b] === gameState[c]) {
+        roundWon = true; winIdx = i; break;
+      }
+    }
+
+    if (roundWon) {
+      statusDisplay.textContent = `${currentPlayer} wins!`;
+      statusDisplay.className = 'status draw';
+      gameActive = false;
+      drawWinLine(winIdx);
+      recordResult(currentPlayer);
+      showReset();
+      return;
+    }
+
+    if (!gameState.includes('')) {
+      statusDisplay.textContent = 'Draw!';
+      statusDisplay.className = 'status draw';
+      gameActive = false;
+      recordResult('Draw');
+      showReset();
+      return;
+    }
+
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    statusDisplay.textContent = `${currentPlayer}'s turn`;
+    statusDisplay.className = `status ${currentPlayer.toLowerCase()}`;
+  }
+
+  // ── Score & highscore logic ──
+  function recordResult(winner) {
+    gamesPlayed++;
+    if (winner === 'X')    scores.X++;
+    else if (winner === 'O') scores.O++;
+    else                   scores.Draw++;
+
+    scoreXEl.textContent    = scores.X;
+    scoreOEl.textContent    = scores.O;
+    scoreDrawEl.textContent = scores.Draw;
+
+    // Update highscore entries
+    if (winner !== 'Draw') {
+      const entry = highscores.find(h => h.player === winner);
+      entry.wins++;
+    }
+    highscores.forEach(h => h.games++);
+
+    renderHighscores();
+  }
+
+  function renderHighscores() {
+    if (gamesPlayed === 0) {
+      highscoreList.innerHTML = '<div class="empty-hs">No games played yet</div>';
+      return;
+    }
+
+    // Sort by wins desc
+    const sorted = [...highscores].sort((a,b) => b.wins - a.wins);
+
+    let html = `
+      <div class="hs-row header-row">
+        <div class="hs-rank">#</div>
+        <div class="hs-player">Player</div>
+        <div class="hs-wins">Wins</div>
+        <div class="hs-win-rate">Win %</div>
+      </div>`;
+
+    sorted.forEach((entry, i) => {
+      const rate    = entry.games > 0 ? Math.round(entry.wins / entry.games * 100) : 0;
+      const crown   = i === 0 && entry.wins > 0 ? '<span class="crown">👑</span>' : '';
+      const cls     = entry.player === 'X' ? 'x-col' : 'o-col';
+      html += `
+        <div class="hs-row">
+          <div class="hs-rank">${i + 1}</div>
+          <div class="hs-player ${cls}">${crown}Player ${entry.player}</div>
+          <div class="hs-wins">${entry.wins}</div>
+          <div class="hs-win-rate">${rate}%</div>
+        </div>`;
+    });
+
+    // Draws row
+    const drawRate = gamesPlayed > 0 ? Math.round(scores.Draw / gamesPlayed * 100) : 0;
+    html += `
+      <div class="hs-row" style="opacity:0.55">
+        <div class="hs-rank">—</div>
+        <div class="hs-player" style="color:#ffe066">Draws</div>
+        <div class="hs-wins">${scores.Draw}</div>
+        <div class="hs-win-rate">${drawRate}%</div>
+      </div>
+      <div class="hs-row" style="opacity:0.3; font-size:12px; justify-content:center; padding:6px 0">
+        ${gamesPlayed} game${gamesPlayed !== 1 ? 's' : ''} played this session
+      </div>`;
+
+    highscoreList.innerHTML = html;
+  }
+
+  // ── Win line ──
+  function coordsForCell(idx) {
+    const cell = boardEl.children[idx];
+    return {
+      x: cell.offsetLeft + cell.offsetWidth / 2,
+      y: cell.offsetTop  + cell.offsetHeight / 2,
+    };
+  }
+
+  function drawWinLine(winIdx) {
+    if (winLineEl) winLineEl.remove();
+    const [s, e] = winLineMap[winIdx];
+    setTimeout(() => {
+      const start  = coordsForCell(s);
+      const end    = coordsForCell(e);
+      const dx     = end.x - start.x;
+      const dy     = end.y - start.y;
+      const length = Math.sqrt(dx*dx + dy*dy);
+      const angle  = Math.atan2(dy, dx) * 180 / Math.PI;
+
+      winLineEl = document.createElement('div');
+      winLineEl.className = 'win-line';
+      winLineEl.style.cssText = `width:${length}px;left:${start.x}px;top:${start.y - 8}px;transform:rotate(${angle}deg)`;
+      boardEl.appendChild(winLineEl);
+    }, 40);
+  }
+
+  // ── Shake & Vibration ──
+  const shakeClasses  = ['shake1','shake2','shake3','shake4'];
+  // Rhythmic vibration patterns matching each shake (ms pulses)
+  const vibePatterns  = [
+    [30, 20, 30],          // shake1: tick-tick
+    [60, 30, 40],          // shake2: thud-settle
+    [20, 15, 20, 15, 20],  // shake3: rat-tat-tat
+    [50, 30, 30, 20],      // shake4: boom-bop
+  ];
+  let shakeIndex = 0;
+
+  function triggerShake() {
+    const cls = shakeClasses[shakeIndex % 4];
+    document.body.classList.remove(...shakeClasses);
+    // Force reflow so re-adding the same class restarts the animation
+    void document.body.offsetWidth;
+    document.body.classList.add(cls);
+    shakeIndex++;
+  }
+
+  function triggerVibration() {
+    if (!navigator.vibrate) return;
+    const pattern = vibePatterns[(shakeIndex - 1) % 4];
+    navigator.vibrate(pattern);
+  }
+
+  // ── Reset ──
+  function resetGame() {
+    gameState     = ['','','','','','','','',''];
+    currentPlayer = 'X';
+    gameActive    = true;
+    allMoves      = [];
+    moveCount     = 0;
+    moveCountEl.textContent = 0;
+    statusDisplay.textContent = "X's turn";
+    statusDisplay.className   = 'status x';
+    document.querySelectorAll('.cell').forEach(c => c.innerHTML = '');
+    if (winLineEl) { winLineEl.remove(); winLineEl = null; }
+    hideReset();
+  }
+
+  function clearAll() {
+    scores      = { X: 0, O: 0, Draw: 0 };
+    gamesPlayed = 0;
+    highscores  = [
+      { player: 'X', wins: 0, games: 0 },
+      { player: 'O', wins: 0, games: 0 },
+    ];
+    scoreXEl.textContent    = 0;
+    scoreOEl.textContent    = 0;
+    scoreDrawEl.textContent = 0;
+    renderHighscores();
+    resetGame();
+  }
+
+  function showReset() { resetButton.classList.add('show'); }
+  function hideReset() { resetButton.classList.remove('show'); }
+
+  resetButton.addEventListener('click', resetGame);
+  clearButton.addEventListener('click', clearAll);
+
+  initializeBoard();
+  renderHighscores();
+});
+</script>
 </body>
 </html>
